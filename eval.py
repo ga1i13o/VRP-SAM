@@ -17,7 +17,7 @@ from SAM2pred import SAM_pred
 
 
 def eval(args, model, sam_model, dataloader, training):
-    r""" Train VRP_encoder model """
+    r""" eval VRP_encoder model """
 
     utils.fix_randseed(0) 
     model.eval()
