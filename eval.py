@@ -13,8 +13,7 @@ from common.logger import Logger, AverageMeter
 from common.evaluation import Evaluator
 from common import utils
 from data.dataset import FSSDataset
-from SAM2pred import SAM_pred
-
+from sam2_predictor import SAM2pred
 
 def eval(args, model, sam_model, dataloader, training):
     r""" eval VRP_encoder model """
@@ -79,7 +78,7 @@ if __name__ == '__main__':
         model.load_state_dict(ck)   
     Logger.log_params(model)
 
-    sam_model = SAM_pred()
+    sam_model = SAM2pred()
     sam_model.to(device)
     model.to(device)
     

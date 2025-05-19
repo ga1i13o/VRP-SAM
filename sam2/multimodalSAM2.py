@@ -2,7 +2,6 @@ import torch
 from torch import nn
 from sam2.utils.misc_gen import interpolate
 from hydra import compose, initialize
-import einops
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 from torch.nn import functional as F
@@ -12,7 +11,7 @@ from sam2.model_utils import BackboneOutput, DecoderOutput
 class promptableSAM2(nn.Module):
     mask_threshold: float = 0.0
     image_format: str = "RGB"
-    def __init__(self, image_size, sam, args):
+    def __init__(self, image_size, sam):
         super().__init__()
         self.fusion_stages_vis = sam.image_encoder.trunk.stage_ends
         self.image_size = image_size
@@ -136,7 +135,7 @@ class promptableSAM2(nn.Module):
         return x
 
 
-def build_sam2(args):
+def build_sam2():
     # image encoder and decoder
     config_file = 'sam2_configs/sam2_hiera_l.yaml'
     sam2_weights = 'pretrain/sam2_hiera_large.pt'
@@ -147,7 +146,7 @@ def build_sam2(args):
         sam = instantiate(cfg.model, _recursive_=True)
     state_dict = torch.load(sam2_weights, map_location="cpu")["model"]
     sam.load_state_dict(state_dict, strict=False)
-    model = promptableSAM2(image_size=sam.image_size, sam=sam, args=args)
+    model = promptableSAM2(image_size=sam.image_size, sam=sam)
         
             
     return model
