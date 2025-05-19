@@ -1,4 +1,3 @@
-from segment_anything import sam_model_registry
 import os
 import torch
 from torch import nn
