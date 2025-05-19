@@ -142,6 +142,7 @@ class PromptEncoder(nn.Module):
         points: Optional[Tuple[torch.Tensor, torch.Tensor]],
         boxes: Optional[torch.Tensor],
         masks: Optional[torch.Tensor],
+        protos: Optional[torch.Tensor],
 
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
@@ -172,7 +173,9 @@ class PromptEncoder(nn.Module):
         if boxes is not None:
             box_embeddings = self._embed_boxes(boxes)
             sparse_embeddings = torch.cat([sparse_embeddings, box_embeddings], dim=1)
-
+        if protos is not None:
+            proto_embeddings = protos
+            sparse_embeddings = torch.cat([sparse_embeddings, proto_embeddings], dim=1)
         if masks is not None:
             dense_embeddings = self._embed_masks(masks)
         else:

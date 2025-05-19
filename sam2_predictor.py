@@ -44,6 +44,7 @@ class SAM2pred(nn.Module):
             points=points,
             boxes=None,
             masks=None,
+            protos=protos,
         )
 
         return  sparse_embeddings, dense_embeddings
