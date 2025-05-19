@@ -13,7 +13,7 @@ from common.logger import Logger, AverageMeter
 from common.evaluation import Evaluator
 from common import utils
 from data.dataset import FSSDataset
-from SAM2pred import SAM_pred
+from sam2_predictor import SAM2pred
 
 
 def train(args, epoch, model, sam_model, dataloader, optimizer, scheduler, training):
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     # Arguments parsing
     parser = argparse.ArgumentParser(description='Visual Prompt Encoder Pytorch Implementation')
-    parser.add_argument('--datapath', type=str, default='/root/paddlejob/workspace/env_run/datsets/')
+    parser.add_argument('--datapath', type=str, default='/scratch/gtrivigno/datasets')
     parser.add_argument('--benchmark', type=str, default='coco', choices=['pascal', 'coco', 'fss', 'lvis', 'paco_part', 'fss', 'pascal_part'])
     parser.add_argument('--logpath', type=str, default='')
     parser.add_argument('--bsz', type=int, default=2) # batch size = num_gpu * bsz default num_gpu = 4
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('--nworker', type=int, default=8)
     parser.add_argument('--seed', type=int, default=321)
     parser.add_argument('--fold', type=int, default=0)
-    parser.add_argument('--condition', type=str, default='scribble', choices=['point', 'scribble', 'box', 'mask'])
+    parser.add_argument('--condition', type=str, default='mask', choices=['point', 'scribble', 'box', 'mask'])
     parser.add_argument('--use_ignore', type=bool, default=True, help='Boundaries are not considered during pascal training')
     parser.add_argument('--local_rank', type=int, default=-1, help='number of cpu threads to use during batch generation')
     parser.add_argument('--num_query', type=int, default=50)
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     if utils.is_main_process():
         Logger.log_params(model)
 
-    sam_model = SAM_pred()
+    sam_model = SAM2pred()
     sam_model.to(device)
     model.to(device)
     model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
