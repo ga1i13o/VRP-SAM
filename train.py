@@ -65,12 +65,13 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=50)
     parser.add_argument('--nworker', type=int, default=8)
     parser.add_argument('--seed', type=int, default=321)
-    parser.add_argument('--fold', type=int, default=0, choices=[0, 1, 2, 3])
+    parser.add_argument('--fold', type=int, default=0)
     parser.add_argument('--condition', type=str, default='scribble', choices=['point', 'scribble', 'box', 'mask'])
     parser.add_argument('--use_ignore', type=bool, default=True, help='Boundaries are not considered during pascal training')
     parser.add_argument('--local_rank', type=int, default=-1, help='number of cpu threads to use during batch generation')
     parser.add_argument('--num_query', type=int, default=50)
     parser.add_argument('--backbone', type=str, default='resnet50', choices=['vgg16', 'resnet50', 'resnet101'])
+    parser.add_argument('--resume', type=str, default=None)
     args = parser.parse_args()
     # Distributed setting
     local_rank = args.local_rank
@@ -85,6 +86,11 @@ if __name__ == '__main__':
     utils.fix_randseed(args.seed)
     # Model initialization
     model = VRP_encoder(args, args.backbone, False)
+    if args.resume is not None:
+        ck = torch.load(args.resume)
+        ck = {k.replace('module.', ''):v for k, v in ck.items()}
+        model.load_state_dict(ck)   
+
     if utils.is_main_process():
         Logger.log_params(model)
 
