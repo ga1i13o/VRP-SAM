@@ -14,6 +14,7 @@ from common.evaluation import Evaluator
 from common import utils
 from data.dataset import FSSDataset
 from sam2_predictor import SAM2pred
+from time import time
 
 def eval(args, model, sam_model, dataloader, training):
     r""" eval VRP_encoder model """
@@ -21,13 +22,15 @@ def eval(args, model, sam_model, dataloader, training):
     utils.fix_randseed(0) 
     model.eval()
     average_meter = AverageMeter(dataloader.dataset)
-
+    t_el = 0
     for idx, batch in enumerate(dataloader):
         
         batch = utils.to_cuda(batch)
+        s = time()
         protos, _ = model(args.condition, batch['query_img'], batch['support_imgs'].squeeze(1), batch['support_masks'].squeeze(1), training)
 
         low_masks, pred_mask = sam_model(batch['query_img'], batch['query_name'], protos)
+        t_el += time() -s
         logit_mask = low_masks
         
         pred_mask = torch.sigmoid(logit_mask) > 0.5
@@ -37,7 +40,10 @@ def eval(args, model, sam_model, dataloader, training):
         # print(area_inter, area_union, batch['class_id'], loss.detach().clone())
         average_meter.update(area_inter, area_union, batch['class_id'], None)
         average_meter.write_process(idx, len(dataloader), 0, write_batch_idx=100)
-
+        if (idx + 1) % 100 == 0:
+            lat = t_el / (idx*2)
+            fps = 1 / lat
+            print(f'fps = {fps:.1f}')
     average_meter.write_result('Validation', 0)
     avg_loss = utils.mean(average_meter.loss_buf)
     miou, fb_iou = average_meter.compute_iou()
