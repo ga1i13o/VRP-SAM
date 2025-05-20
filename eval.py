@@ -51,7 +51,7 @@ if __name__ == '__main__':
     # Arguments parsing
     parser = argparse.ArgumentParser(description='Visual Prompt Encoder Pytorch Implementation')
     parser.add_argument('--datapath', type=str, default='/root/paddlejob/workspace/env_run/datsets/')
-    parser.add_argument('--benchmark', type=str, default='coco', choices=['pascal', 'coco', 'fss', 'lvis', 'paco_part', 'fss', 'pascal_part'])
+    parser.add_argument('--benchmark', type=str, default='coco', choices=['pascal', 'coco', 'fss', 'lvis', 'paco_part', 'fss', 'pascal_part', 'pascalcd'])
     parser.add_argument('--logpath', type=str, default='')
     parser.add_argument('--bsz', type=int, default=1) # batch size = num_gpu * bsz default num_gpu = 4
     parser.add_argument('--lr', type=float, default=1e-4)

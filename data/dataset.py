@@ -9,6 +9,7 @@ from data.lvis import DatasetLVIS
 from data.paco_part import DatasetPACOPart
 from data.fss import DatasetFSS
 from data.pascal_part import DatasetPASCALPart
+from data.pascal_voc_cd import DatasetPASCALCD
 # from data.coco2pascal import DatasetCOCO2PASCAL
 
 
@@ -24,6 +25,7 @@ class FSSDataset:
             'paco_part': DatasetPACOPart,
             'fss': DatasetFSS,
             'pascal_part': DatasetPASCALPart,
+            'pascalcd': DatasetPASCALCD,
             # 'coco2pascal': DatasetCOCO2PASCAL
         }
 
