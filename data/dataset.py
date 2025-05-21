@@ -51,4 +51,4 @@ class FSSDataset:
         else:
             dataloader = DataLoader(dataset, batch_size=bsz, shuffle=False, pin_memory=True, num_workers=nworker)
 
-        return dataloader
+        return dataloader, dataset

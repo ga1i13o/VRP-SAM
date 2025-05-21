@@ -94,7 +94,8 @@ if __name__ == '__main__':
 
     # Dataset initialization
     FSSDataset.initialize(img_size=512, datapath=args.datapath, use_original_imgsize=False)
-    dataloader_val = FSSDataset.build_dataloader(args.benchmark, args.bsz, args.nworker, args.fold, 'val')
+    dataloader_val, dataset = FSSDataset.build_dataloader(args.benchmark, args.bsz, args.nworker, args.fold, 'val')
+    dataset.sample_annotated_refs()
     with torch.no_grad():
         val_loss, val_miou, val_fb_iou = eval(args, model, sam_model, dataloader_val, training=False)
     print(val_miou)

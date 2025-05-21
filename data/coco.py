@@ -27,7 +27,24 @@ class DatasetCOCO(Dataset):
         self.img_metadata = self.build_img_metadata()
 
     def __len__(self):
-        return len(self.img_metadata) if self.split == 'trn' else 1000
+        return len(self.img_metadata) if self.split == 'trn' else 10000
+
+    def sample_annotated_refs(self):
+        self.sampled_refs = {}
+        for ci in self.class_ids:
+            query_name = np.random.choice(self.img_metadata_classwise[ci], 1, replace=False)[0]
+            #query_img = Image.open(os.path.join(self.base_path, query_name)).convert('RGB')
+            query_img = Image.open(os.path.join(self.base_path, 'val2014', query_name + '.jpg')).convert('RGB')
+            query_mask = self.read_mask(query_name)
+
+            query_mask[query_mask != ci + 1] = 0
+            query_mask[query_mask == ci + 1] = 1
+            query_img = self.transform(query_img)
+            query_mask = query_mask.float()
+            if not self.use_original_imgsize:
+                query_mask = F.interpolate(query_mask.unsqueeze(0).unsqueeze(0).float(), query_img.size()[-2:], mode='nearest')
+
+            self.sampled_refs[ci] = (query_name, query_img, query_mask[0])
 
     def __getitem__(self, idx):
         # ignores idx during training & testing and perform uniform sampling over object classes to form an episode
@@ -39,10 +56,10 @@ class DatasetCOCO(Dataset):
         if not self.use_original_imgsize:
             query_mask = F.interpolate(query_mask.unsqueeze(0).unsqueeze(0).float(), query_img.size()[-2:], mode='nearest').squeeze()
 
-        support_imgs = torch.stack([self.transform(support_img) for support_img in support_imgs])
-        for midx, smask in enumerate(support_masks):
-            support_masks[midx] = F.interpolate(smask.unsqueeze(0).unsqueeze(0).float(), support_imgs.size()[-2:], mode='nearest').squeeze()
-        support_masks = torch.stack(support_masks)
+        # support_imgs = torch.stack([self.transform(support_img) for support_img in support_imgs])
+        # for midx, smask in enumerate(support_masks):
+        #     support_masks[midx] = F.interpolate(smask.unsqueeze(0).unsqueeze(0).float(), support_imgs.size()[-2:], mode='nearest').squeeze()
+        # support_masks = torch.stack(support_masks)
 
         batch = {'query_img': query_img,
                  'query_mask': query_mask,
@@ -128,24 +145,25 @@ class DatasetCOCO(Dataset):
 
         query_mask[query_mask != class_sample + 1] = 0
         query_mask[query_mask == class_sample + 1] = 1
+        support_names, support_imgs, support_masks = self.sampled_refs[class_sample]
 
-        support_names = []
-        while True:  # keep sampling support set if query == support
-            support_name = np.random.choice(self.img_metadata_classwise[class_sample], 1, replace=False)[0]
-            if query_name != support_name: support_names.append(support_name)
-            if len(support_names) == self.shot: break
+        # support_names = []
+        # while True:  # keep sampling support set if query == support
+        #     support_name = np.random.choice(self.img_metadata_classwise[class_sample], 1, replace=False)[0]
+        #     if query_name != support_name: support_names.append(support_name)
+        #     if len(support_names) == self.shot: break
 
-        support_imgs = []
-        support_masks = []
-        for support_name in support_names:
-            if 'val2014' in support_name:
-                base_path_s = os.path.join(self.base_path, 'val2014')
-            else:
-                base_path_s = os.path.join(self.base_path, 'train2014')
-            support_imgs.append(Image.open(os.path.join(base_path_s, support_name + '.jpg')).convert('RGB'))
-            support_mask = self.read_mask(support_name)
-            support_mask[support_mask != class_sample + 1] = 0
-            support_mask[support_mask == class_sample + 1] = 1
-            support_masks.append(support_mask)
+        # support_imgs = []
+        # support_masks = []
+        # for support_name in support_names:
+        #     if 'val2014' in support_name:
+        #         base_path_s = os.path.join(self.base_path, 'val2014')
+        #     else:
+        #         base_path_s = os.path.join(self.base_path, 'train2014')
+        #     support_imgs.append(Image.open(os.path.join(base_path_s, support_name + '.jpg')).convert('RGB'))
+        #     support_mask = self.read_mask(support_name)
+        #     support_mask[support_mask != class_sample + 1] = 0
+        #     support_mask[support_mask == class_sample + 1] = 1
+        #     support_masks.append(support_mask)
 
         return query_img, query_mask, support_imgs, support_masks, query_name, support_names, class_sample, org_qry_imsize
