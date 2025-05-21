@@ -8,21 +8,11 @@ if not os.path.abspath(os.curdir) == folder: sys.exit()
 NGPUS = 1
 BS = 16
 grid = [    
-    {'name': f'vrpsam2_coco_fold0', ' --benchmark': 'coco'},    
-    {'name': f'vrpsam2_coco_fold1', ' --benchmark': 'coco'},    
-    {'name': f'vrpsam2_coco_fold2', ' --benchmark': 'coco'},    
-    {'name': f'vrpsam2_coco_fold3', ' --benchmark': 'coco'},    
+    {'name': f'vrpsam_pascal_fold0', ' --benchmark': 'pascal'},    
+    {'name': f'vrpsam_pascal_fold1', ' --benchmark': 'pascal'},    
+    {'name': f'vrpsam_pascal_fold2', ' --benchmark': 'pascal'},    
+    {'name': f'vrpsam_pascal_fold3', ' --benchmark': 'pascal'},    
 
-    {'name': f'vrpsam2_lvis_fold0', ' --benchmark': 'lvis'},    
-    {'name': f'vrpsam2_lvis_fold1', ' --benchmark': 'lvis'},    
-    {'name': f'vrpsam2_lvis_fold2', ' --benchmark': 'lvis'},    
-    {'name': f'vrpsam2_lvis_fold3', ' --benchmark': 'lvis'},    
-    {'name': f'vrpsam2_lvis_fold4', ' --benchmark': 'lvis'},    
-    {'name': f'vrpsam2_lvis_fold5', ' --benchmark': 'lvis'},    
-    {'name': f'vrpsam2_lvis_fold6', ' --benchmark': 'lvis'},    
-    {'name': f'vrpsam2_lvis_fold7', ' --benchmark': 'lvis'},    
-    {'name': f'vrpsam2_lvis_fold8', ' --benchmark': 'lvis'},    
-    {'name': f'vrpsam2_lvis_fold9', ' --benchmark': 'lvis'},    
 ]
 
 for arg_set in grid:
@@ -62,7 +52,7 @@ export WANDB_API_KEY="138defcbedc69ea57f4884949f29ce11311edb44"
 cd {folder}
 port=$(python get_free_port.py)
 python  -m torch.distributed.launch --nproc_per_node={NGPUS} --master_port=${{port}} --use_env train.py \
-    --datapath /leonardo_scratch/fast/IscrB_LarGEO/fast_dataset  \
+    --datapath ../datasets  \
     --logpath EXP_NAME --backbone resnet50 --condition mask --num_query 50 \
     --epochs 50 --lr 1e-4  --bsz {BS} {add_args}
 """
