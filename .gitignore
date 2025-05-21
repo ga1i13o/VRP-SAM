@@ -1,5 +1,6 @@
 .idea
 a_env
+ign*
 .spyproject
 __pycache__
 *.ipynb

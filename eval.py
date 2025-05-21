@@ -40,10 +40,10 @@ def eval(args, model, sam_model, dataloader, training):
         # print(area_inter, area_union, batch['class_id'], loss.detach().clone())
         average_meter.update(area_inter, area_union, batch['class_id'], None)
         average_meter.write_process(idx, len(dataloader), 0, write_batch_idx=100)
-        if (idx + 1) % 100 == 0:
-            lat = t_el / (idx*2)
-            fps = 1 / lat
-            print(f'fps = {fps:.1f}')
+        # if (idx + 1) % 100 == 0:
+        #     lat = t_el / (idx*2)
+        #     fps = 1 / lat
+        #     print(f'fps = {fps:.1f}')
     average_meter.write_result('Validation', 0)
     avg_loss = utils.mean(average_meter.loss_buf)
     miou, fb_iou = average_meter.compute_iou()
