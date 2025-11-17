@@ -6,9 +6,14 @@ import torch.nn.functional as F
 import numpy as np
 
 class  SAM_pred(nn.Module):
-    def __init__(self, ):
+    def __init__(self, sam_version):
         super().__init__()
-        self.sam_model = sam_model_registry['vit_h']('sam_vit_h_4b8939.pth')
+        assert sam_version in ['vit_h', 'vit_l']
+        if sam_version == 'vit_h':
+            weights = 'sam_vit_h_4b8939.pth'
+        else:
+            weights = 'sam_vit_l_0b3195.pth'
+        self.sam_model = sam_model_registry[sam_version](weights)
         self.sam_model.eval()
 
     def forward_img_encoder(self, query_img):

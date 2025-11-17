@@ -2,10 +2,13 @@
 a_env
 .spyproject
 __pycache__
+pretrain
 *.ipynb
 logs
 *.pth
 out_files
 jobs
+ign*
 cl_launcher*
 get_free*
+.vscode
